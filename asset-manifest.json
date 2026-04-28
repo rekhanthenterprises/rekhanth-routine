@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/rekhanth-routine/static/css/main.e6c13ad2.css",
+    "main.js": "/rekhanth-routine/static/js/main.e43ef2f1.js",
+    "static/js/239.4053f5e9.chunk.js": "/rekhanth-routine/static/js/239.4053f5e9.chunk.js",
+    "static/js/977.4a13aa42.chunk.js": "/rekhanth-routine/static/js/977.4a13aa42.chunk.js",
+    "static/js/732.63bd2d38.chunk.js": "/rekhanth-routine/static/js/732.63bd2d38.chunk.js",
+    "static/js/488.f1d9554d.chunk.js": "/rekhanth-routine/static/js/488.f1d9554d.chunk.js",
+    "index.html": "/rekhanth-routine/index.html",
+    "main.e6c13ad2.css.map": "/rekhanth-routine/static/css/main.e6c13ad2.css.map",
+    "main.e43ef2f1.js.map": "/rekhanth-routine/static/js/main.e43ef2f1.js.map",
+    "239.4053f5e9.chunk.js.map": "/rekhanth-routine/static/js/239.4053f5e9.chunk.js.map",
+    "977.4a13aa42.chunk.js.map": "/rekhanth-routine/static/js/977.4a13aa42.chunk.js.map",
+    "732.63bd2d38.chunk.js.map": "/rekhanth-routine/static/js/732.63bd2d38.chunk.js.map",
+    "488.f1d9554d.chunk.js.map": "/rekhanth-routine/static/js/488.f1d9554d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.e43ef2f1.js"
+  ]
+}
