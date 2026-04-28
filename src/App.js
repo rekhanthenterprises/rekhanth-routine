@@ -256,7 +256,6 @@ export default function App() {
     doc.setTextColor(140, 140, 160);
     doc.setFontSize(9);
     const weekStart = weekStats[0];
-    const weekEnd = weekStats[6];
     const weekLabel = `Week of ${weekStart.day}`;
     doc.text(weekLabel, W / 2, 33, { align: "center" });
 
