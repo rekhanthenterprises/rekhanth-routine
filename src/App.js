@@ -1,3 +1,5 @@
+import { db } from "./firebase";
+import { ref, set, onValue } from "firebase/database";
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import emailjs from "@emailjs/browser";
@@ -187,17 +189,23 @@ export default function App() {
   const [emailStatus, setEmailStatus] = useState("idle");
   const [pdfBusy, setPdfBusy] = useState(false);
 
+  // Load from Firebase on startup
   useEffect(() => {
+    const completionsRef = ref(db, "completions");
+    onValue(completionsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setCompletions(data);
+    });
     try {
-      const c = localStorage.getItem("rk_completions");
-      if (c) setCompletions(JSON.parse(c));
       const e = localStorage.getItem("rk_email_cfg");
       if (e) setEmailCfg(JSON.parse(e));
     } catch (_) {}
   }, []);
 
+  // Save to Firebase on every change
   useEffect(() => {
-    localStorage.setItem("rk_completions", JSON.stringify(completions));
+    if (Object.keys(completions).length === 0) return;
+    set(ref(db, "completions"), completions);
   }, [completions]);
 
   const now = new Date();
