@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/rekhanth-routine/static/css/main.4efb37a3.css",
-    "main.js": "/rekhanth-routine/static/js/main.e5440e56.js",
+    "main.js": "/rekhanth-routine/static/js/main.e3112975.js",
     "static/js/52.6f2988e5.chunk.js": "/rekhanth-routine/static/js/52.6f2988e5.chunk.js",
     "static/js/82.ffdd2c66.chunk.js": "/rekhanth-routine/static/js/82.ffdd2c66.chunk.js",
     "static/js/265.9e65c701.chunk.js": "/rekhanth-routine/static/js/265.9e65c701.chunk.js",
@@ -10,6 +10,6 @@
   },
   "entrypoints": [
     "static/css/main.4efb37a3.css",
-    "static/js/main.e5440e56.js"
+    "static/js/main.e3112975.js"
   ]
 }
