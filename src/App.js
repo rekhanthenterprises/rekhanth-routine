@@ -242,6 +242,8 @@ function getWeekDates() {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("daily");
+  const [currentUser, setCurrentUser] = useState(null); // "rekhanth" | "nagasoundarya"
+  const [userSelected, setUserSelected] = useState(false);
   const [goalCompletions, setGoalCompletions] = useState({});
   const [expanded, setExpanded] = useState(null);
   const [completions, setCompletions] = useState({});
@@ -251,31 +253,50 @@ export default function App() {
 
   // Load from Firebase on startup
   useEffect(() => {
-  // existing completions listener
-  const completionsRef = ref(db, "completions");
-  onValue(completionsRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) setCompletions(data);
-  });
+    // Check if user already selected
+    const savedUser = localStorage.getItem("rk_current_user");
+    if (savedUser) {
+      setCurrentUser(savedUser);
+      setUserSelected(true);
+    }
 
-  // ADD THIS — load goals from Firebase
-  const goalsRef = ref(db, "goalCompletions");
-  onValue(goalsRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) setGoalCompletions(data);
-  });
+    try {
+      const e = localStorage.getItem("rk_email_cfg");
+      if (e) setEmailCfg(JSON.parse(e));
+    } catch (_) {}
+  }, []);
 
-  try {
-    const e = localStorage.getItem("rk_email_cfg");
-    if (e) setEmailCfg(JSON.parse(e));
-  } catch (_) {}
-}, []);
+  // Load completions from Firebase
+  useEffect(() => {
+    if (!currentUser) return;
+    const completionsRef = ref(db, `users/${currentUser}/completions`);
+    onValue(completionsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setCompletions(data);
+    });
+  }, [currentUser]);
+
+  // Load goals from Firebase
+  useEffect(() => {
+    if (!currentUser) return;
+    const goalsRef = ref(db, `users/${currentUser}/goalCompletions`);
+    onValue(goalsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) setGoalCompletions(data);
+    });
+  }, [currentUser]);
 
   // Save to Firebase on every change
   useEffect(() => {
     if (Object.keys(completions).length === 0) return;
-    set(ref(db, "completions"), completions);
-  }, [completions]);
+    if (currentUser) set(ref(db, `users/${currentUser}/completions`), completions);
+  }, [completions, currentUser]);
+
+  // Save goal completions to Firebase
+  useEffect(() => {
+    if (Object.keys(goalCompletions).length === 0) return;
+    if (currentUser) set(ref(db, `users/${currentUser}/goalCompletions`), goalCompletions);
+  }, [goalCompletions, currentUser]);
 
   const now = new Date();
   const Key = getKey();
@@ -452,6 +473,64 @@ const getMonthScore = (monthKey, totalGoals) => {
       setTimeout(() => setEmailStatus("idle"), 4000);
     }
   };
+
+  // User selection screen
+  if (!userSelected) {
+    return (
+      <div style={{ minHeight:"100vh", background:"#0A0A0F", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia,serif" }}>
+      <div style={{ textAlign:"center", padding:"40px 24px", maxWidth:"360px", width:"100%" }}>
+        
+        {/* Logo */}
+        <div style={{ marginBottom:"32px" }}>
+          <p style={{ color:"#A855F7", fontSize:"11px", letterSpacing:"3px", fontFamily:"monospace", margin:"0 0 12px" }}>ROUTINE TRACKER</p>
+          <h1 style={{ color:"#E8E8F0", fontSize:"26px", fontWeight:"normal", margin:"0 0 8px" }}>Who are you?</h1>
+          <p style={{ color:"#555", fontSize:"13px", margin:0, fontStyle:"italic" }}>May → December 2026</p>
+        </div>
+
+        {/* User cards */}
+        {[
+          { id:"rekhanth",      name:"Rekhanth",      emoji:"👨‍💻", role:"System Engineer · TCS",        color:"#3B82F6" },
+          { id:"nagasoundarya", name:"Nagasoundarya",  emoji:"👩‍🔬", role:"Scientist · Eurofins",          color:"#EC4899" },
+        ].map(user => (
+          <div
+            key={user.id}
+            onClick={() => {
+              setCurrentUser(user.id);
+              setUserSelected(true);
+              localStorage.setItem("rk_current_user", user.id);
+            }}
+            style={{
+              background:"#111118",
+              border:`1px solid ${user.color}30`,
+              borderRadius:"14px",
+              padding:"20px",
+              marginBottom:"12px",
+              cursor:"pointer",
+              transition:"all 0.2s",
+              display:"flex",
+              alignItems:"center",
+              gap:"16px",
+              textAlign:"left",
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = user.color}
+            onMouseLeave={e => e.currentTarget.style.borderColor = `${user.color}30`}
+          >
+            <span style={{ fontSize:"36px" }}>{user.emoji}</span>
+            <div>
+              <p style={{ color:"#E8E8F0", fontSize:"16px", margin:"0 0 4px" }}>{user.name}</p>
+              <p style={{ color:"#666", fontSize:"11px", fontFamily:"monospace", margin:0 }}>{user.role}</p>
+            </div>
+            <span style={{ marginLeft:"auto", color:user.color, fontSize:"18px" }}>→</span>
+          </div>
+        ))}
+
+        <p style={{ color:"#333", fontSize:"10px", fontFamily:"monospace", margin:"20px 0 0" }}>
+          No password needed · Data saved per user
+        </p>
+      </div>
+    </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "#07080F", color: "#E8E8F0", fontFamily: "Inter, sans-serif" }}>
