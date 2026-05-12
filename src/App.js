@@ -105,7 +105,7 @@ const schedule = [
     title: "Night Reflection + Planning",
     icon: "📓",
     category: "mindset",
-    detail: "Open your notebook. Write:\n1. One thing I did well today.\n2. One thing I'll improve tomorrow.\n3. Progress on marriage fund: ₹___\n4. Applications sent today: ___\nThis keeps you moving and out of anxiety spirals.\nSet tomorrow's 3 priorities before closing the book.",
+    detail: "Open your notebook. Write:\n1. One thing I did well .\n2. One thing I'll improve tomorrow.\n3. Progress on marriage fund: ₹___\n4. Applications sent : ___\nThis keeps you moving and out of anxiety spirals.\nSet tomorrow's 3 priorities before closing the book.",
   },
   {
     time: "12:20 AM",
@@ -123,7 +123,7 @@ const weeklyBlocks = [
   { day: "Tuesday", special: "Pull day. LinkedIn networking — 2 connection requests with note.", emoji: "🔗" },
   { day: "Wednesday", special: "Push day. Mid-week check-in with Nagasoundarya on marriage fund progress.", emoji: "💍" },
   { day: "Thursday", special: "Shoulders + Core. Review your expense tracker. No unnecessary spending check.", emoji: "📊" },
-  { day: "Friday", special: "Full body. End of week job application push. Apply to 7+ today.", emoji: "🚀" },
+  { day: "Friday", special: "Full body. End of week job application push. Apply to 7+ .", emoji: "🚀" },
   { day: "Saturday", special: "Cardio only. Date activity with Nagasoundarya — temple visit, park, chai walk. Keep relationship alive.", emoji: "❤️" },
 ];
 
@@ -146,10 +146,68 @@ const categories = {
   work: { color: "#F97316", bg: "rgba(249,115,22,0.12)", label: "Work" },
   relationship: { color: "#EC4899", bg: "rgba(236,72,153,0.12)", label: "Relationship" },
 };
+const MONTHLY_GOALS = [
+  { month: "May",  color: "#F97316", goals: [
+    "Get blood test done — B12, Vit D, Sugar, Thyroid",
+    "Start applying to 5 jobs/day on Naukri + LinkedIn",
+    "Begin .NET Clean Architecture portfolio repo on GitHub",
+    "Track every expense daily in a sheet",
+    "Open separate savings account — label it Marriage Fund",
+  ]},
+  { month: "Jun",  color: "#EF4444", goals: [
+    "First interview calls received",
+    "₹50,000 saved toward marriage fund",
+    "Finish 1 complete portfolio project with README",
+    "Note exact interest rates of all active loans",
+    "Set a gentle boundary with brother — not your financial load",
+  ]},
+  { month: "Jul",  color: "#F59E0B", goals: [
+    "Job offer received or final interview stage",
+    "₹1,00,000 in marriage fund",
+    "Azure AZ-204 — 50% modules completed",
+    "Bike research done — shortlist 2 second-hand options",
+    "Parents informally told about marriage plan",
+  ]},
+  { month: "Aug",  color: "#22C55E", goals: [
+    "Job switch executed — salary ₹75,000+",
+    "₹1,80,000 in marriage fund",
+    "Azure certification exam booked",
+    "Bike purchased or payment planned",
+    "Engagement plan discussed with Nagasoundarya",
+  ]},
+  { month: "Sep",  color: "#06B6D4", goals: [
+    "₹2,50,000 in marriage fund",
+    "Azure AZ-204 exam cleared",
+    "Wedding venue/temple shortlisted",
+    "Both families meeting planned",
+    "Loan EMI review done post salary jump",
+  ]},
+  { month: "Oct",  color: "#3B82F6", goals: [
+    "₹3,50,000 in marriage fund",
+    "Both families officially met",
+    "Temple marriage date fixed",
+    "Reception venue in Bangalore booked",
+    "Nagasoundarya's loan EMIs — zero defaults confirmed",
+  ]},
+  { month: "Nov",  color: "#8B5CF6", goals: [
+    "₹5,00,000 in marriage fund",
+    "All wedding vendors finalized",
+    "Invitation list ready",
+    "Outfits purchased — simple and meaningful",
+    "Legal registration prep done",
+  ]},
+  { month: "Dec",  color: "#A855F7", goals: [
+    "MARRIED ✓",
+    "Total wedding spend under ₹7,00,000",
+    "Both families together and happy",
+    "New chapter officially started",
+    "80% of all 8-month goals achieved 🎉",
+  ]},
+];
 
 const motivations = [
   "Show up consistently. Progress is built through repetition.",
-  "Small wins today compound into the life you want.",
+  "Small wins  compound into the life you want.",
   "Stay calm, stay disciplined, and remember why you started.",
   "Each completed block is a step closer to your goal.",
 ];
@@ -157,6 +215,7 @@ const motivations = [
 const tabs = [
   { id: "daily", label: "Daily" },
   { id: "monthly", label: "Monthly" },
+  { id: "goals", label: "Goals" },
   { id: "motivation", label: "Motivation" },
   { id: "report", label: "Report" },
   { id: "settings", label: "Settings" },
@@ -164,17 +223,17 @@ const tabs = [
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-function getTodayKey() {
+function getKey() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function getWeekDates() {
-  const today = new Date();
-  const first = today.getDate() - today.getDay();
+  const now = new Date();
+  const first = now.getDate() - now.getDay();
   const week = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date(today.getFullYear(), today.getMonth(), first + i);
+    const date = new Date(now.getFullYear(), now.getMonth(), first + i);
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     week.push({ date, key, day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()] });
   }
@@ -183,6 +242,7 @@ function getWeekDates() {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("daily");
+  const [goalCompletions, setGoalCompletions] = useState({});
   const [expanded, setExpanded] = useState(null);
   const [completions, setCompletions] = useState({});
   const [emailCfg, setEmailCfg] = useState({ svcId: "", tplId: "", pubKey: "", toEmail: "" });
@@ -191,16 +251,25 @@ export default function App() {
 
   // Load from Firebase on startup
   useEffect(() => {
-    const completionsRef = ref(db, "completions");
-    onValue(completionsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) setCompletions(data);
-    });
-    try {
-      const e = localStorage.getItem("rk_email_cfg");
-      if (e) setEmailCfg(JSON.parse(e));
-    } catch (_) {}
-  }, []);
+  // existing completions listener
+  const completionsRef = ref(db, "completions");
+  onValue(completionsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) setCompletions(data);
+  });
+
+  // ADD THIS — load goals from Firebase
+  const goalsRef = ref(db, "goalCompletions");
+  onValue(goalsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) setGoalCompletions(data);
+  });
+
+  try {
+    const e = localStorage.getItem("rk_email_cfg");
+    if (e) setEmailCfg(JSON.parse(e));
+  } catch (_) {}
+}, []);
 
   // Save to Firebase on every change
   useEffect(() => {
@@ -209,24 +278,36 @@ export default function App() {
   }, [completions]);
 
   const now = new Date();
-  const todayKey = getTodayKey();
-  const todayLabel = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  const Key = getKey();
+  const Label = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
   const currentMonth = monthNames[now.getMonth()];
   const currentMonthlyGoal = monthlyGoals.find((item) => item.month === currentMonth) || monthlyGoals[0];
+
+  const toggleGoal = (monthKey, goalIdx) => {
+  const key = `${monthKey}-${goalIdx}`;
+  setGoalCompletions(p => ({ ...p, [key]: !p[key] }));
+};
+
+const getMonthScore = (monthKey, totalGoals) => {
+  const done = Array.from({ length: totalGoals }, (_, i) =>
+    goalCompletions[`${monthKey}-${i}`]
+  ).filter(Boolean).length;
+  return { done, total: totalGoals, pct: Math.round((done / totalGoals) * 100) };
+};
 
   const toggleTask = (taskIndex) => {
     setCompletions((prev) => ({
       ...prev,
-      [todayKey]: {
-        ...(prev[todayKey] || {}),
-        [taskIndex]: !((prev[todayKey] || {})[taskIndex] || false),
+      [Key]: {
+        ...(prev[Key] || {}),
+        [taskIndex]: !((prev[Key] || {})[taskIndex] || false),
       },
     }));
   };
 
-  const todayCompletions = completions[todayKey] || {};
-  const todayDone = schedule.filter((_, idx) => todayCompletions[idx]).length;
-  const todayPercent = Math.round((todayDone / schedule.length) * 100);
+  const Completions = completions[Key] || {};
+  const Done = schedule.filter((_, idx) => Completions[idx]).length;
+  const Percent = Math.round((Done / schedule.length) * 100);
 
   const weekDates = getWeekDates();
   const weekStats = weekDates.map((d) => {
@@ -340,7 +421,7 @@ export default function App() {
     doc.setFont("helvetica", "italic");
     doc.text(footerMsg, W / 2, yPos + 7, { align: "center" });
 
-    doc.save("rekhanth-weekly-report-" + todayKey + ".pdf");
+    doc.save("rekhanth-weekly-report-" + Key + ".pdf");
   };
 
   const handleEmail = async () => {
@@ -358,7 +439,7 @@ export default function App() {
           to_email: emailCfg.toEmail,
           week_score: `${weekAverage}%`,
           day_breakdown: weekBreakdown,
-          report_date: todayKey,
+          report_date: Key,
           month: currentMonth,
           goals: currentMonthlyGoal.goals.join("\n"),
         },
@@ -378,7 +459,7 @@ export default function App() {
         <div style={{ maxWidth: "920px", margin: "0 auto" }}>
           <p style={{ margin: 0, color: "#A855F7", letterSpacing: "2px", fontSize: "11px", textTransform: "uppercase", fontFamily: "monospace" }}>Daily routine · monthly goals · motivation</p>
           <h1 style={{ margin: "11px 0 4px", fontSize: "32px", lineHeight: 1.1 }}>Your daily roadmap</h1>
-          <p style={{ margin: 0, color: "#9CA3AF", fontSize: "13px" }}>{todayLabel} · {currentMonthlyGoal.month} goal active</p>
+          <p style={{ margin: 0, color: "#9CA3AF", fontSize: "13px" }}>{Label} · {currentMonthlyGoal.month} goal active</p>
 
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "18px" }}>
             {phases.map((phase) => (
@@ -421,7 +502,7 @@ export default function App() {
               {schedule.map((item, index) => {
                 const category = categories[item.category] || categories.mindset;
                 const open = expanded === index;
-                const isChecked = todayCompletions[index] || false;
+                const isChecked = Completions[index] || false;
                 return (
                   <div key={item.time} style={{ borderRadius: "18px", overflow: "hidden", border: `1px solid ${isChecked ? category.color : "#1F2937"}`, background: isChecked ? category.bg : "#111827" }}>
                     <button
@@ -488,25 +569,25 @@ export default function App() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px", marginTop: "28px" }}>
-              {/* Today's progress card */}
+              {/* 's progress card */}
               <div style={{ padding: "20px", borderRadius: "18px", background: "#111827", border: "1px solid #1F2937" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "14px" }}>
                   <div>
-                    <p style={{ margin: 0, color: "#A855F7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px" }}>Today's progress</p>
-                    <h2 style={{ margin: "8px 0 0", fontSize: "28px", fontWeight: "bold" }}>{todayPercent}%</h2>
+                    <p style={{ margin: 0, color: "#A855F7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px" }}>'s progress</p>
+                    <h2 style={{ margin: "8px 0 0", fontSize: "28px", fontWeight: "bold" }}>{Percent}%</h2>
                   </div>
                   <div style={{ fontSize: "32px" }}>📊</div>
                 </div>
                 <div style={{ background: "#1F2937", borderRadius: "12px", height: "8px", overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${todayPercent}%`, background: "#A855F7", borderRadius: "12px", transition: "width 0.3s" }} />
+                  <div style={{ height: "100%", width: `${Percent}%`, background: "#A855F7", borderRadius: "12px", transition: "width 0.3s" }} />
                 </div>
-                <p style={{ margin: "12px 0 0", color: "#9CA3AF", fontSize: "13px" }}>{todayDone} of {schedule.length} tasks completed</p>
+                <p style={{ margin: "12px 0 0", color: "#9CA3AF", fontSize: "13px" }}>{Done} of {schedule.length} tasks completed</p>
               </div>
 
               <div style={{ padding: "20px", borderRadius: "18px", background: "#111827", border: "1px solid #1F2937" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", marginBottom: "14px" }}>
                   <div>
-                    <p style={{ margin: 0, color: "#A855F7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px" }}>Today's motivation</p>
+                    <p style={{ margin: 0, color: "#A855F7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px" }}>'s motivation</p>
                     <h2 style={{ margin: "8px 0 0", fontSize: "20px" }}>Stay consistent. Keep your focus.</h2>
                   </div>
                   <div style={{ fontSize: "28px" }}>✨</div>
@@ -597,7 +678,112 @@ export default function App() {
             })}
           </div>
         )}
+        {/* ════════════ GOALS ════════════ */}
+        {/* ════════════ GOALS ════════════ */}
+        {activeTab === "goals" && (
+          <div style={{ paddingTop: "20px" }}>
 
+            {/* Overall progress */}
+            {(() => {
+              const totalGoals = MONTHLY_GOALS.reduce((s, m) => s + m.goals.length, 0);
+              const totalDone  = MONTHLY_GOALS.reduce((s, m) =>
+                s + m.goals.filter((_, i) => goalCompletions[`${m.month}-${i}`]).length, 0);
+              const overallPct = Math.round((totalDone / totalGoals) * 100);
+              return (
+                <div style={{ textAlign:"center", background:"linear-gradient(135deg,rgba(168,85,247,0.1),rgba(59,130,246,0.05))", border:"1px solid rgba(168,85,247,0.2)", borderRadius:"14px", padding:"20px", marginBottom:"20px" }}>
+                  <p style={{ fontFamily:"monospace", color:"#666", fontSize:"10px", letterSpacing:"2px", margin:"0 0 6px" }}>8-MONTH OVERALL PROGRESS</p>
+                  <p style={{ fontFamily:"monospace", color:"#A855F7", fontSize:"42px", fontWeight:"bold", margin:"0 0 4px" }}>{overallPct}%</p>
+                  <p style={{ color:"#888", fontSize:"12px", margin:"0 0 12px", fontStyle:"italic" }}>{totalDone} of {totalGoals} goals completed</p>
+                  <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:"6px", height:"8px", overflow:"hidden" }}>
+                    <div style={{ height:"100%", width:`${overallPct}%`, background:"linear-gradient(90deg,#A855F7,#3B82F6)", borderRadius:"6px", transition:"width 0.6s ease" }}/>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Monthly cards */}
+            {MONTHLY_GOALS.map((monthData) => {
+              const { done, total, pct } = getMonthScore(monthData.month, monthData.goals.length);
+              const currentMonth = new Date().toLocaleString("default", { month: "short" });
+              const isCurrentMonth = monthData.month === currentMonth;
+
+              return (
+                <div key={monthData.month} style={{
+                  background: "#111118",
+                  border: `1px solid ${isCurrentMonth ? monthData.color+"60" : "#1e1e2e"}`,
+                  borderRadius: "12px",
+                  marginBottom: "12px",
+                  overflow: "hidden",
+                }}>
+                  {/* Month header */}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 16px", borderBottom:"1px solid #1e1e2e" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+                      <div style={{ width:"10px", height:"10px", borderRadius:"50%", background:monthData.color, boxShadow:`0 0 8px ${monthData.color}60` }}/>
+                      <span style={{ fontFamily:"monospace", color: isCurrentMonth ? monthData.color : "#DDD", fontSize:"13px", fontWeight:"bold" }}>
+                        {monthData.month} 2026 {isCurrentMonth ? "← current" : ""}
+                      </span>
+                    </div>
+                    <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                      <span style={{ fontFamily:"monospace", color: pct===100?"#22C55E":monthData.color, fontSize:"13px", fontWeight:"bold" }}>{pct}%</span>
+                      <span style={{ fontFamily:"monospace", color:"#555", fontSize:"10px" }}>{done}/{total}</span>
+                    </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div style={{ background:"#1a1a2e", height:"4px" }}>
+                    <div style={{ height:"100%", width:`${pct}%`, background:monthData.color, transition:"width 0.5s ease" }}/>
+                  </div>
+
+                  {/* Goals list */}
+                  <div style={{ padding:"10px 12px" }}>
+                    {monthData.goals.map((goal, idx) => {
+                      const done = !!goalCompletions[`${monthData.month}-${idx}`];
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => toggleGoal(monthData.month, idx)}
+                          style={{
+                            display:"flex", alignItems:"flex-start", gap:"10px",
+                            padding:"9px 4px",
+                            borderBottom: idx < monthData.goals.length-1 ? "1px solid #1a1a28" : "none",
+                            cursor:"pointer",
+                          }}
+                        >
+                          {/* Checkbox */}
+                          <div style={{
+                            width:"20px", height:"20px", borderRadius:"5px", flexShrink:0, marginTop:"1px",
+                            border:`2px solid ${done ? monthData.color : "#333"}`,
+                            background: done ? monthData.color : "transparent",
+                            display:"flex", alignItems:"center", justifyContent:"center",
+                            transition:"all 0.2s",
+                          }}>
+                            {done && <span style={{ color:"#000", fontSize:"12px", fontWeight:"bold" }}>✓</span>}
+                          </div>
+
+                          <span style={{
+                            fontSize:"12.5px", lineHeight:"1.5",
+                            color: done ? "#555" : "#CCC",
+                            textDecoration: done ? "line-through" : "none",
+                            flex:1,
+                          }}>
+                            {goal}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Completed banner */}
+                  {pct === 100 && (
+                    <div style={{ textAlign:"center", padding:"10px", background:`${monthData.color}15`, borderTop:`1px solid ${monthData.color}30` }}>
+                      <span style={{ color:monthData.color, fontSize:"12px" }}>🎉 Month complete!</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
         {activeTab === "motivation" && (
           <div style={{ display: "grid", gap: "18px" }}>
             <div style={{ padding: "22px", borderRadius: "20px", background: "#111827", border: "1px solid rgba(255,255,255,0.07)" }}>
@@ -636,7 +822,7 @@ export default function App() {
               <p style={{ margin: 0, color: "#3B82F6", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1.5px" }}>📄 PDF Report</p>
               <h2 style={{ margin: "10px 0 10px", fontSize: "20px" }}>Download schedule & goals</h2>
               <p style={{ margin: "0 0 14px", color: "#9CA3AF", fontSize: "13px" }}>
-                Generates a comprehensive A4 PDF with today's schedule and monthly goals for {currentMonth}.
+                Generates a comprehensive A4 PDF with 's schedule and monthly goals for {currentMonth}.
               </p>
               <button
                 onClick={() => { setPdfBusy(true); setTimeout(() => { generatePDF(); setPdfBusy(false); }, 100); }}
